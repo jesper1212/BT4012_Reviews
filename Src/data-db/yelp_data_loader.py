@@ -1,11 +1,16 @@
+
+
 import sqlite3
 import pandas as pd
 from time import time
 
 def load_training_data():
     print("Obtaining Training Data")
-    db_path = "/Users/admin/Desktop/UNI/Y3/BT4012/Project/YelpData/yelpResData.db"
+    # db_path = "/Users/admin/Desktop/UNI/Y3/y3s1/BT4012 Project/BT4012_Reviews/YelpData/yelpResData.db"
     conn = sqlite3.connect(db_path)
+
+     
+
     conn.text_factory = lambda x: str(x, 'gb2312', 'ignore')
     db_cursor = conn.cursor()
 
@@ -14,8 +19,7 @@ def load_training_data():
     # for reviews, we select those where flagged are either Y/N to be used in training set 
     sql_queries = {
         'review':  "SELECT date AS reviewDate, reviewID, reviewerID, reviewContent, rating AS reviewRating,\
-                        usefulCount AS reviewUsefulCount, coolCount AS reviewCoolCount, funnyCount AS reviewFunnyCount, restaurantID, \
-                            flagged FROM review WHERE flagged in ('Y','N')",
+                        usefulCount AS reviewUsefulCount, coolCount AS reviewCoolCount, funnyCount AS reviewFunnyCount, restaurantID, flagged",
         'reviewer': "SELECT reviewerID, name AS reviewerName, location AS reviewerLocation, yelpJoinDate AS reviewerYelpJoinDate, \
                         friendCount AS reviewerFriendCount, reviewCount AS reviewerNumReviews, reviewCount AS reviewerFirstCount, usefulCount AS reviewerUsefulCount, \
                              coolCount AS reviewerCoolCount, funnyCount AS reviewerFunnyCount, complimentCount AS reviewerComplimentCount, \
@@ -37,7 +41,7 @@ def load_training_data():
         data_frames[table_name] = pd.DataFrame(db_cursor.fetchall(), columns=[column[0] for column in db_cursor.description])
         
         # save the files to csv 
-        data_frames[table_name].to_csv(f"{table_name}.csv", sep=',', index=False)
+        # data_frames[table_name].to_csv(f"{table_name}.csv", sep=',', index=False)
         # print(data_frames[table_name])
         print(data_frames[table_name].info())
 
@@ -57,9 +61,11 @@ def load_training_data():
 def main():
     merged_df = load_training_data()
 
-    merged_df.to_csv('merged_df.csv', sep=',', index=False)
+    merged_df_2 = merged_df.sample(n=50000, random_state=1)
 
-
+# If you want to save the sampled data to a new CSV file:
+    merged_df_2.to_csv('merged_df.csv', sep=',', index=False)
 
 if __name__ == '__main__':
     main()
+
